@@ -1,4 +1,4 @@
-# 🎓 Meritum01
+# 🎓 Meritum
 
 <div align="center">
 
