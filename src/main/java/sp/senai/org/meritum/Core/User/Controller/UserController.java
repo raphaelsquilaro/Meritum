@@ -1,56 +1,85 @@
 package sp.senai.org.meritum.Core.User.Controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import sp.senai.org.meritum.Core.User.Dto.UserRequestDTO;
-import sp.senai.org.meritum.Core.User.Dto.UserResponseDTO;
-import sp.senai.org.meritum.Core.User.Service.UserService;
+import sp.senai.org.meritum.Core.User.Domain.Entity.User;
+import sp.senai.org.meritum.Core.User.Repository.UserRepository;
 
-import java.util.List;
-
-@RestController
-@RequestMapping("/users")
+@Controller
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService service;
+    private final UserRepository repository;
 
-    @PostMapping
-    public ResponseEntity<
-            UserResponseDTO
-            > create(
+    @GetMapping("/user/listagem")
+    public String listarUser(Model model) {
 
-            @RequestBody
-            UserRequestDTO dto
-    ){
-
-        return ResponseEntity.ok(
-                service.create(dto)
+        model.addAttribute(
+                "users",
+                repository.findAll()
         );
+
+        return "user/listagem";
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<
-            UserResponseDTO
-            > findById(
+    @GetMapping("/user/cadastro")
+    public String cadastroUser(Model model) {
 
-            @PathVariable
-            Long id
-    ){
-
-        return ResponseEntity.ok(
-                service.findById(id)
+        model.addAttribute(
+                "user",
+                new User()
         );
+
+        return "user/cadastro";
     }
 
-    @GetMapping
-    public ResponseEntity<
-            List<UserResponseDTO>
-            > findAll(){
+    @GetMapping("/user/editar/{id}")
+    public String editarUser(
+            @PathVariable Long id,
+            Model model
+    ) {
 
-        return ResponseEntity.ok(
-                service.findAll()
+        User user =
+                repository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Conquista não encontrada"
+                                )
+                        );
+
+        model.addAttribute(
+                "user",
+                user
         );
+
+        return "user/cadastro";
+    }
+
+    @PostMapping("/user/salvar")
+    public String salvarUser(
+            @Valid @ModelAttribute User user,
+            BindingResult result
+    ) {
+
+        if (result.hasErrors()) {
+            return "user/cadastro";
+        }
+
+        repository.save(user);
+
+        return "redirect:/user/listagem";
+    }
+
+    @GetMapping("/user/excluir/{id}")
+    public String excluirUser(
+            @PathVariable Long id
+    ) {
+        repository.deleteById(id);
+
+        return "redirect:/user/listagem";
     }
 }

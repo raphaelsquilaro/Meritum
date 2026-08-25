@@ -1,8 +1,8 @@
-package sp.senai.org.meritum.Core.User.Dto;
+package sp.senai.org.meritum.Core.User.Dto.Update;
 
 import jakarta.validation.constraints.Size;
 
-public record UserUpdateDTO(
+public record UserUpdate(
 
         @Size(
                 min = 3,

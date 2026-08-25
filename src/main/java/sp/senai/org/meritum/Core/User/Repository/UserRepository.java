@@ -32,4 +32,6 @@ public interface UserRepository
     Optional<User> findByIdAndActiveTrue(
             Long id
     );
+
+    Optional<User> findByEmailValue(String value);
 }
